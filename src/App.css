@@ -35,6 +35,12 @@
   border-radius: 4%;
   box-shadow: 0 0 0.5cm rgba(0,0,0,0.5);
   width: 20vw;
-  height: 300px;
+  min-height: 20vh;
   align-self: flex-start;/*flex-end*/
+}
+
+#footer {
+  text-align: right;
+  font-size: small;
+  margin: 10px 20px 5px 20px;
 }

@@ -1,0 +1,18 @@
+.loading {
+  display: flex;
+  align-items: center;
+  flex-direction: column;
+}
+
+.loading span {
+  font-size: small;
+  margin-top: -15px;
+}
+
+#employee-data {
+  margin: 15px 35px;
+}
+
+.algo {
+  padding: 6px 0px
+}

@@ -10,16 +10,46 @@ import TableHead from '@material-ui/core/TableHead';
 import TableRow from '@material-ui/core/TableRow';
 import Paper from '@material-ui/core/Paper';
 
-function Element(props) { 
-  return(
+
+import { LoadingInfo } from './components/LoadingInfo';
+import { EmployeeInfo } from './components/employeeCard';
+
+
+function Element(props) {
+  return (
     <div className="element">
+      <div>{props.name}</div>
       {props.children}
     </div>
   )
 }
-class TableEmployee extends React.Component {
+
+class ReactRest extends React.Component {
+
+  constructor(props) {
+    super(props);
+    this.state = {
+      employees: [],
+      componentfetch: true,
+    }
+  }
+  componentDidMount() {
+    fetch('http://localhost:8081/ceibacoins')
+      .then(response => response.json())
+      .then(jsonData => this.setState({ employees: jsonData, componentfetch: false }))
+  }
+
+  handleClick(idUser) {
+    alert('this is:' + idUser, this);
+  }
+
   render() {
-    return(
+    if (this.state.componentfetch) {
+      return <LoadingInfo/>
+    }
+
+    return (
+      <div>
         <TableContainer component={Paper}>
           <Table className="efwe" aria-label="simple table">
             <TableHead>
@@ -29,59 +59,24 @@ class TableEmployee extends React.Component {
               </TableRow>
             </TableHead>
             <TableBody>
-              <TableRow key="dsds">
-                <TableCell component="th" scope="row">
-                  dsfds
-                </TableCell>
-                <TableCell align="right">121</TableCell>
-              </TableRow>
+              {this.state.employees.map(employee => (
+                <TableRow hover role="checkbox" key={employee.nuip} tabIndex={-1} onClick={(e) => this.handleClick(employee.nuip, e)} >
+                  <TableCell component="th" scope="row">
+                    {employee.employeeName} {employee.employeeLastName}
+                  </TableCell>
+                  <TableCell align="right">{employee.nuip}</TableCell>
+                </TableRow>
+              ))}
             </TableBody>
           </Table>
         </TableContainer>
+        <div id="footer">Total empleados: {Object.keys(this.state.employees).length}</div>
+      </div>
     )
   }
 }
 
-class ReactRest extends React.Component {
-
-  constructor(props){
-    super(props);
-    this.state = {
-      usuarios: [],
-      componentfetch: true
-    }
-  }
-  componentDidMount() {
-    // fetch('https://mdn.github.io/learning-area/javascript/oojs/json/superheroes.json')
-    //     .then(response => response.json())
-    //     .then(jsonData => this.setState({usuarios: jsonData.members, componentfetch: false}))
-    fetch('http://localhost:8081/ceibacoins',  {
-      credentials: 'same-origin',
-      'Access-Control-Allow-Origin': 'http://localhost:8081/ceibacoins',
-      Origin:  'http://localhost:8081/ceibacoins',
-      headers: {
-        Origin:  'http://localhost:8081/ceibacoins',
-        'Accept': 'application/json',
-        'Content-Type': 'application/json',
-        'Access-Control-Allow-Origin' : 'http://localhost:8081/ceibacoins',
-      }
-    })
-        .then(response => console.log(response.json()));
-        // .then(jsonData => this.setState({usuarios: jsonData, componentfetch: false}));
-  }
-
-  render() {
-    if(this.state.componentfetch){
-      return 'loading...'
-    }
-
-    return (
-        this.state.usuarios.map((usuario) => <div>{usuario.employeeName}</div>)
-    )
-
-
-  }
-}
+const rows = []
 
 function App() {
   return (
@@ -91,15 +86,20 @@ function App() {
         <img src={logoCeiba} className="ceiba-logo" alt="logo" />
       </header>
       <div className="App-content">
-        <Element>
-          <TableEmployee/>
+        <Element name="Empleados">
+          <ReactRest/>
         </Element>
         <Element>
-          <ReactRest/>
+          <EmployeeInfo />
+        </Element>
+        <Element>
+        <LoadingInfo/>
         </Element>
       </div>
     </div>
   );
 }
+
+
 
 export default App;
