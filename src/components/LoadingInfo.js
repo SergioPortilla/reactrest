@@ -1,7 +1,7 @@
 import React from 'react';
 
-import loading from '../images/loading.gif'
-import '../style/components.css';
+import loading from '../images/loading.gif';
+import '../styles/components.css';
 
 export function LoadingInfo(props) {
   return(

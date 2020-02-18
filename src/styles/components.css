@@ -16,3 +16,9 @@
 .algo {
   padding: 6px 0px
 }
+
+#footer {
+  text-align: right;
+  font-size: small;
+  margin: 10px 20px 5px 20px;
+}

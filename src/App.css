@@ -23,6 +23,7 @@
   min-height: 92vh;
   display: flex;
   flex-direction: row;
+  flex-wrap: wrap;
   align-items: center;
   justify-content: center;
   font-size: calc(10px + 2vmin);
@@ -34,13 +35,8 @@
   padding: 10px 0px;
   border-radius: 4%;
   box-shadow: 0 0 0.5cm rgba(0,0,0,0.5);
+  min-width: 350px;
   width: 20vw;
   min-height: 20vh;
   align-self: flex-start;/*flex-end*/
-}
-
-#footer {
-  text-align: right;
-  font-size: small;
-  margin: 10px 20px 5px 20px;
 }
