@@ -13,15 +13,10 @@ import PersonAddRoundedIcon from '@material-ui/icons/PersonAddRounded';
 import EditRoundedIcon from '@material-ui/icons/EditRounded';
 import DeleteIcon from '@material-ui/icons/Delete';
 
-import Snackbar from '@material-ui/core/Snackbar';
-import MuiAlert from '@material-ui/lab/Alert';
+import { MessageInfo } from './messageInfo';
 
 import imgAvatar from '../images/imgAvatar.png';
 import '../styles/components.css';
-
-function Alert(props) {
-  return <MuiAlert elevation={6} variant="filled" {...props} />;
-}
 
 export class EmployeeInfo extends React.Component {
 
@@ -31,15 +26,33 @@ export class EmployeeInfo extends React.Component {
     this.state = {
       newEmployee: true,
       employeeData: {
+        nuip: '',
+        employeeName: '',
+        employeeLastName: '',
         birthday: new Date(),
         entry: new Date(),
         ceibaCoins: 0,
-        state: true
+        state: true,
       },
       open: false,
       editable: false
     }
   }
+  
+  addNewEmployee = () => {
+    this.setState({
+    employeeData: {
+      nuip: '',
+      employeeName: '',
+      employeeLastName: '',
+      birthday: new Date(),
+      entry: new Date(),
+      ceibaCoins: 0,
+      state: true,
+    },
+    newEmployee: true,
+    editable: false})
+  };
 
   componentWillReceiveProps(nextProps){
     fetch('http://localhost:8081/ceibacoins/'+nextProps.nuip)
@@ -51,30 +64,23 @@ export class EmployeeInfo extends React.Component {
     
   }
 
-  handleClick = () => {
-    this.setState({open : true});
-  };
-
-  handleClose = (event, reason) => {
-    if (reason === 'clickaway') {
-      return;
-    }
-
-    this.setState({open : false});
-  };
+  validateChange(value, field){
+    this.setState(prevState => { 
+      let employeeData = prevState.employeeData;
+      employeeData[field] = value;
+      return { employeeData };
+    })
+  }
 
   createEmployee = e => {
-    console.log(e);
     e.preventDefault();
+    console.log(this.state.employeeData);
     fetch('http://localhost:8081/ceibacoins/', {
         method: 'POST',
-        body: this.state.employeeData,
-        headers: {
-            'Content-Type': 'application/json'
-        }
+        body: JSON.stringify(this.state.employeeData),
     }).then(res => {
-        console.log(res);
-    }).catch(err => {console.log(err)});
+        return console.log(res);
+    }).catch(err => console.log("dsfds"+err));
   }
 
   render() {
@@ -86,19 +92,19 @@ export class EmployeeInfo extends React.Component {
             <div className="algo" >
               <TextField required disabled={this.state.editable} fullWidth
                 label="Numero de identificación" value={this.state.employeeData.nuip}
-                onInput={(e) => { this.setState({ employeeData:{nuip : e.target.value.replace(/\D/g, '')}}) }}
+                onInput={(e) => { this.validateChange(e.target.value.replace(/\D/g, ''), 'nuip') }}
               />
             </div>
             <div className="algo">
               <TextField required disabled={this.state.editable} fullWidth
-                label="Nombres" value={this.state.employeeData.employeeName}
-                onInput={(e) => { this.setState({ employeeData:{employeeName: e.target.value.toUpperCase() }}) }}
+                label="Nombres" value={this.state.employeeData.employeeName} 
+                onInput={(e) => { this.validateChange(e.target.value.toUpperCase(), 'employeeName') }}
               />
             </div>
             <div className="algo">
               <TextField required disabled={this.state.editable} fullWidth
                 label="Apellidos" value={this.state.employeeData.employeeLastName}
-                onInput={(e) => { this.setState({ employeeData:{employeeLastName: e.target.value.toUpperCase() }}) }}
+                onInput={(e) => { this.validateChange(e.target.value.toUpperCase(), 'employeeLastName') }}
               />
               
             </div>
@@ -113,14 +119,14 @@ export class EmployeeInfo extends React.Component {
             <div className="algo">
               <KeyboardDatePicker disableToolbar variant="inline" format="dd/MM/yyyy"
                 label="Fecha de nacimiento" fullWidth disabled={this.state.editable}
-                value={this.state.employeeData.birthday} onChange={(e) => { this.setState({ employeeData:{birthday: e }}) }}
+                value={this.state.employeeData.birthday} onChange={(e) => { this.validateChange(e, 'birthday') }}
                 KeyboardButtonProps={{ 'aria-label': 'change date', }}
               />
             </div>
             <div className="algo">
               <KeyboardDatePicker disableToolbar variant="inline" format="dd/MM/yyyy"
                 label="Fecha de ingreso a la compañia" fullWidth disabled={this.state.editable}
-                value={this.state.employeeData.entry} onChange={(e) => { this.setState({employeeData:{ entry: e }}) }}
+                value={this.state.employeeData.entry} onChange={(e) => { this.validateChange(e, 'entry') }}
                 KeyboardButtonProps={{ 'aria-label': 'change date', }}
               />
             </div>
@@ -131,25 +137,17 @@ export class EmployeeInfo extends React.Component {
                 <IconButton aria-label="delete" color="primary">
                   <DeleteIcon />
                 </IconButton>
-                <IconButton aria-label="PersonAddRoundedIcon" color="primary">
+                <IconButton aria-label="PersonAddRoundedIcon" color="primary" onClick={this.addNewEmployee}>
                   <PersonAddRoundedIcon />
                 </IconButton>
-                <IconButton aria-label="EditRoundedIcon" color="primary" on>
+                <IconButton aria-label="EditRoundedIcon" color="primary" onClick={e => {this.setState({editable: false})}}>
                   <EditRoundedIcon />
                 </IconButton>
               </div>
             ) : (
               <Button type="submit" variant="outlined" size="medium" color="primary" > Crear Empleado </Button>
             )}
-            <Button variant="outlined" onClick={this.handleClick}>
-              Open success snackbar
-            </Button>
-            <Snackbar open={this.state.open} autoHideDuration={6000} onClose={this.handleClose}>
-              <Alert onClose={this.handleClose} severity="success">
-                This is a success message!
-              </Alert>
-            </Snackbar>
-            
+            <MessageInfo message="holii" open={true}/>
           </div>
           </div>
           
