@@ -20,7 +20,7 @@ class App extends React.Component {
     nuip: '',
   };
 
-  ManejarNuevoSaludo = datos => {
+  VerInformacionUsuario = datos => {
     this.setState({nuip: datos});
   };
 
@@ -33,7 +33,7 @@ class App extends React.Component {
         </header>
         <div className="App-content">
           <Element name="Empleados">
-            <EmployeeList alObtenerNuevoSaludo={this.ManejarNuevoSaludo}/>
+            <EmployeeList obtenerNuip={this.VerInformacionUsuario}/>
           </Element>
           <Element>
             <EmployeeInfo nuip={this.state.nuip}/>

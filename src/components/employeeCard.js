@@ -6,7 +6,6 @@ import DateFnsUtils from '@date-io/date-fns';
 import Button from '@material-ui/core/Button';
 import { MuiPickersUtilsProvider, KeyboardDatePicker } from '@material-ui/pickers';
 import Input from '@material-ui/core/Input';
-import InputLabel from '@material-ui/core/InputLabel';
 import InputAdornment from '@material-ui/core/InputAdornment';
 
 import IconButton from '@material-ui/core/IconButton';
@@ -14,54 +13,68 @@ import PersonAddRoundedIcon from '@material-ui/icons/PersonAddRounded';
 import EditRoundedIcon from '@material-ui/icons/EditRounded';
 import DeleteIcon from '@material-ui/icons/Delete';
 
+import Snackbar from '@material-ui/core/Snackbar';
+import MuiAlert from '@material-ui/lab/Alert';
+
 import imgAvatar from '../images/imgAvatar.png';
 import '../styles/components.css';
 
+function Alert(props) {
+  return <MuiAlert elevation={6} variant="filled" {...props} />;
+}
+
 export class EmployeeInfo extends React.Component {
-  
+
   constructor(props) {
     super(props);
 
     this.state = {
       newEmployee: true,
-      nuip: '',
-      name: '',
-      lastName: '',
-      born: new Date(),
-      entry: new Date(),
-      ceibacoins: 0,
+      employeeData: {
+        birthday: new Date(),
+        entry: new Date(),
+        ceibaCoins: 0,
+        state: true
+      },
+      open: false,
       editable: false
     }
   }
+
   componentWillReceiveProps(nextProps){
-    fetch('http://localhost:8081/ceibacoins/'+this.props.nuip)
+    fetch('http://localhost:8081/ceibacoins/'+nextProps.nuip)
       .then(response => response.json())
-      .then(jsonData => this.setState({ 
+      .then(employeeData => this.setState({ employeeData,
         newEmployee: false,
-        nuip: jsonData.nuip,
-        name: jsonData.employeeName,
-        lastName: jsonData.employeeLastName,
-        born: new Date(jsonData.birthday),
-        entry: new Date(jsonData.entry),
-        ceibacoins: jsonData.ceibaCoins,
         editable: true
       }));
     
   }
 
-  createEmployee = e =>{
+  handleClick = () => {
+    this.setState({open : true});
+  };
+
+  handleClose = (event, reason) => {
+    if (reason === 'clickaway') {
+      return;
+    }
+
+    this.setState({open : false});
+  };
+
+  createEmployee = e => {
     console.log(e);
     e.preventDefault();
-    return fetch('http://localhost:8081/ceibacoins/', {
+    fetch('http://localhost:8081/ceibacoins/', {
         method: 'POST',
-        mode: 'CORS',
-        body: JSON.stringify(e),
+        body: this.state.employeeData,
         headers: {
             'Content-Type': 'application/json'
         }
     }).then(res => {
-        return res;
-    }).catch(err => err);
+        console.log(res);
+    }).catch(err => {console.log(err)});
   }
 
   render() {
@@ -72,42 +85,42 @@ export class EmployeeInfo extends React.Component {
           <div id="employee-data">
             <div className="algo" >
               <TextField required disabled={this.state.editable} fullWidth
-                label="Numero de identificación" value={this.state.nuip}
-                onInput={(e) => { this.setState({ nuip: e.target.value.replace(/\D/g, '') }) }}
+                label="Numero de identificación" value={this.state.employeeData.nuip}
+                onInput={(e) => { this.setState({ employeeData:{nuip : e.target.value.replace(/\D/g, '')}}) }}
               />
             </div>
             <div className="algo">
               <TextField required disabled={this.state.editable} fullWidth
-                label="Nombres" value={this.state.name}
-                onInput={(e) => { this.setState({ name: e.target.value.toUpperCase() }) }}
+                label="Nombres" value={this.state.employeeData.employeeName}
+                onInput={(e) => { this.setState({ employeeData:{employeeName: e.target.value.toUpperCase() }}) }}
               />
             </div>
             <div className="algo">
               <TextField required disabled={this.state.editable} fullWidth
-                label="Apellidos" value={this.state.lastName}
-                onInput={(e) => { this.setState({ lastName: e.target.value.toUpperCase() }) }}
+                label="Apellidos" value={this.state.employeeData.employeeLastName}
+                onInput={(e) => { this.setState({ employeeData:{employeeLastName: e.target.value.toUpperCase() }}) }}
               />
               
             </div>
-            {!this.state.newEmployee ? (<div className="algo">
+            {!this.state.newEmployee && (<div className="algo">
                 <Input
                   id="standard-adornment-amount"
-                  value={this.state.ceibacoins} fullWidth disabled
+                  value={this.state.employeeData.ceibaCoins} fullWidth disabled
                   startAdornment={<InputAdornment position="start">Ceibacoins $</InputAdornment>}
                 />
-            </div>): (<p></p>)}
+            </div>)}
             <MuiPickersUtilsProvider utils={DateFnsUtils}>
             <div className="algo">
               <KeyboardDatePicker disableToolbar variant="inline" format="dd/MM/yyyy"
                 label="Fecha de nacimiento" fullWidth disabled={this.state.editable}
-                value={this.state.born} onChange={(e) => { this.setState({ born: e }) }}
+                value={this.state.employeeData.birthday} onChange={(e) => { this.setState({ employeeData:{birthday: e }}) }}
                 KeyboardButtonProps={{ 'aria-label': 'change date', }}
               />
             </div>
             <div className="algo">
               <KeyboardDatePicker disableToolbar variant="inline" format="dd/MM/yyyy"
                 label="Fecha de ingreso a la compañia" fullWidth disabled={this.state.editable}
-                value={this.state.entry} onChange={(e) => { this.setState({ entry: e }) }}
+                value={this.state.employeeData.entry} onChange={(e) => { this.setState({employeeData:{ entry: e }}) }}
                 KeyboardButtonProps={{ 'aria-label': 'change date', }}
               />
             </div>
@@ -128,6 +141,14 @@ export class EmployeeInfo extends React.Component {
             ) : (
               <Button type="submit" variant="outlined" size="medium" color="primary" > Crear Empleado </Button>
             )}
+            <Button variant="outlined" onClick={this.handleClick}>
+              Open success snackbar
+            </Button>
+            <Snackbar open={this.state.open} autoHideDuration={6000} onClose={this.handleClose}>
+              <Alert onClose={this.handleClose} severity="success">
+                This is a success message!
+              </Alert>
+            </Snackbar>
             
           </div>
           </div>

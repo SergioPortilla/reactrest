@@ -25,11 +25,7 @@ export class EmployeeList extends React.Component {
       .then(response => response.json())
       .then(jsonData => this.setState({ employees: jsonData, componentfetch: false }))
   }
-
-  handleClick(idUser) {
-    this.props.alObtenerNuevoSaludo(idUser);
-  }
-
+  
   render() {
     if (this.state.componentfetch) {
       return <LoadingInfo/>
@@ -47,7 +43,7 @@ export class EmployeeList extends React.Component {
             </TableHead>
             <TableBody>
               {this.state.employees.map(employee => (
-                <TableRow hover role="checkbox" key={employee.nuip} tabIndex={-1} onClick={(e) => this.handleClick(employee.nuip, e)} >
+                <TableRow hover role="checkbox" key={employee.nuip} tabIndex={-1} onClick={(e) => this.props.obtenerNuip(employee.nuip)} >
                   <TableCell component="th" scope="row">
                     {employee.employeeName} {employee.employeeLastName}
                   </TableCell>
