@@ -14,6 +14,17 @@
   color: white;
 }
 
+.App-header img {
+  background: lightcyan;
+  margin-top: -27px;
+  margin-right: -14px;
+  padding-left: 4vw;
+  border: solid;
+  border-color: lightcyan;
+  border-width: 20px;
+  border-radius: 0% 0% 30% 80%;
+}
+
 .App-header h1 {
   margin: 0px;
 }
@@ -37,6 +48,10 @@
   box-shadow: 0 0 0.5cm rgba(0,0,0,0.5);
   min-width: 350px;
   width: 20vw;
-  min-height: 20vh;
-  align-self: flex-start;/*flex-end*/
+  min-height: 12vh;
+  align-self: flex-start;
+}
+
+.container{
+  align-self: flex-start;
 }

@@ -11,8 +11,9 @@ import Paper from '@material-ui/core/Paper';
 import { LoadingInfo } from './loadingInfo';
 import '../styles/components.css';
 
-export class EmployeeList extends React.Component {
-
+export class ActivityList extends React.Component {
+  
+  
   constructor(props) {
     super(props);
     this.state = {
@@ -21,15 +22,11 @@ export class EmployeeList extends React.Component {
     }
   }
   componentDidMount() {
-    fetch('http://localhost:8081/ceibacoins')
+    fetch('http://localhost:8081/activities')
       .then(response => response.json())
       .then(jsonData => this.setState({ employees: jsonData, componentfetch: false }))
   }
-
-  handleClick(idUser) {
-    alert('this is:' + idUser, this);
-  }
-
+  
   render() {
     if (this.state.componentfetch) {
       return <LoadingInfo/>
@@ -41,24 +38,22 @@ export class EmployeeList extends React.Component {
           <Table className="efwe" aria-label="simple table">
             <TableHead>
               <TableRow>
-                <TableCell>Nombre empleado</TableCell>
-                <TableCell align="right">N° Identificacion</TableCell>
+                <TableCell><b>ACTIVIDAD</b></TableCell>
+                <TableCell align="right"><b>CEIBACOINS</b></TableCell>
               </TableRow>
             </TableHead>
             <TableBody>
               {this.state.employees.map(employee => (
-                <TableRow hover role="checkbox" key={employee.nuip} tabIndex={-1} onClick={(e) => this.handleClick(employee.nuip, e)} >
-                  <TableCell component="th" scope="row">
-                    {employee.employeeName} {employee.employeeLastName}
-                  </TableCell>
-                  <TableCell align="right">{employee.nuip}</TableCell>
+                <TableRow hover role="checkbox" key={employee.idActivity} tabIndex={-1}>
+                  <TableCell component="th"> {employee.name}</TableCell>
+                  <TableCell align="right">{employee.price}</TableCell>
                 </TableRow>
               ))}
             </TableBody>
           </Table>
         </TableContainer>
-        <div id="footer">Total empleados: {Object.keys(this.state.employees).length}</div>
+        <div id="footer">Total Actividades: {Object.keys(this.state.employees).length}</div>
       </div>
     )
   }
-}
+  }

@@ -10,10 +10,14 @@ import InputAdornment from '@material-ui/core/InputAdornment';
 
 import IconButton from '@material-ui/core/IconButton';
 import PersonAddRoundedIcon from '@material-ui/icons/PersonAddRounded';
+import DoneIcon from '@material-ui/icons/Done';
 import EditRoundedIcon from '@material-ui/icons/EditRounded';
 import DeleteIcon from '@material-ui/icons/Delete';
+import { red, green, yellow } from '@material-ui/core/colors';
 
-import { MessageInfo } from './messageInfo';
+import Dialog from '@material-ui/core/Dialog';
+import DialogActions from '@material-ui/core/DialogActions';
+import DialogTitle from '@material-ui/core/DialogTitle';
 
 import imgAvatar from '../images/imgAvatar.png';
 import '../styles/components.css';
@@ -35,23 +39,25 @@ export class EmployeeInfo extends React.Component {
         state: true,
       },
       open: false,
-      editable: false
+      editable: false,
+      verification: false
     }
   }
   
   addNewEmployee = () => {
     this.setState({
-    employeeData: {
-      nuip: '',
-      employeeName: '',
-      employeeLastName: '',
-      birthday: new Date(),
-      entry: new Date(),
-      ceibaCoins: 0,
-      state: true,
-    },
-    newEmployee: true,
-    editable: false})
+      employeeData: {
+        nuip: '',
+        employeeName: '',
+        employeeLastName: '',
+        birthday: new Date(),
+        entry: new Date(),
+        ceibaCoins: 0,
+        state: true,
+      },
+      newEmployee: true,
+      editable: false
+    })
   };
 
   componentWillReceiveProps(nextProps){
@@ -60,8 +66,8 @@ export class EmployeeInfo extends React.Component {
       .then(employeeData => this.setState({ employeeData,
         newEmployee: false,
         editable: true
-      }));
-    
+      })
+    );
   }
 
   validateChange(value, field){
@@ -74,13 +80,29 @@ export class EmployeeInfo extends React.Component {
 
   createEmployee = e => {
     e.preventDefault();
-    console.log(this.state.employeeData);
-    fetch('http://localhost:8081/ceibacoins/', {
-        method: 'POST',
-        body: JSON.stringify(this.state.employeeData),
+    fetch('http://localhost:8081/ceibacoins', {
+      method: 'POST',
+      body: JSON.stringify(this.state.employeeData),
+      headers:{ 'Content-Type': 'application/json' }
     }).then(res => {
         return console.log(res);
     }).catch(err => console.log("dsfds"+err));
+    
+  }
+
+  deleteEmployee = e => {
+    e.preventDefault();
+    this.validateChange(false,"state");
+    this.validateChange(0,"ceibaCoins");
+    let update = this.state.employeeData;
+    console.log(update);
+    fetch('http://localhost:8081/ceibacoins', {
+      method: 'PUT',
+      body: JSON.stringify(update),
+      headers:{ 'Content-Type': 'application/json' }
+    }).then(res => console.log(res)
+    ).catch(err => console.log("dsfds"+err));
+    this.setState({verification: false}) 
   }
 
   render() {
@@ -90,7 +112,7 @@ export class EmployeeInfo extends React.Component {
           <Avatar alt="Remy Sharp" src={imgAvatar} style={{ margin: 'auto', width: '20vh', height: '20vh' }} />
           <div id="employee-data">
             <div className="algo" >
-              <TextField required disabled={this.state.editable} fullWidth
+              <TextField required disabled={!this.state.newEmployee} fullWidth
                 label="Numero de identificación" value={this.state.employeeData.nuip}
                 onInput={(e) => { this.validateChange(e.target.value.replace(/\D/g, ''), 'nuip') }}
               />
@@ -134,23 +156,44 @@ export class EmployeeInfo extends React.Component {
             <div className="algo">
             {!this.state.newEmployee ? (
               <div style={{float: 'right'}} >
-                <IconButton aria-label="delete" color="primary">
-                  <DeleteIcon />
+                <IconButton aria-label="delete" onClick={e => this.setState({verification: true})}>
+                  <DeleteIcon style={{ color: red[500] }}/>
                 </IconButton>
-                <IconButton aria-label="PersonAddRoundedIcon" color="primary" onClick={this.addNewEmployee}>
+                <IconButton aria-label="PersonAddRoundedIcon" color="primary"  onClick={this.addNewEmployee}>
                   <PersonAddRoundedIcon />
                 </IconButton>
-                <IconButton aria-label="EditRoundedIcon" color="primary" onClick={e => {this.setState({editable: false})}}>
-                  <EditRoundedIcon />
-                </IconButton>
+                {this.state.editable ? 
+                  <IconButton aria-label="EditRoundedIcon" onClick={e => {this.setState({editable: false})}}>
+                    <EditRoundedIcon style={{ color: yellow[500] }}/>
+                  </IconButton>
+                : 
+                  <IconButton aria-label="EditRoundedIcon" onClick={this.deleteEmployee}>
+                    <DoneIcon style={{ color: green[500] }}/>
+                  </IconButton>
+                }
               </div>
             ) : (
               <Button type="submit" variant="outlined" size="medium" color="primary" > Crear Empleado </Button>
             )}
-            <MessageInfo message="holii" open={true}/>
           </div>
-          </div>
-          
+        </div>
+
+      <Dialog
+        open={this.state.verification}
+        onClose={e => this.setState({verification: false})}
+        aria-labelledby="alert-dialog-title"
+        aria-describedby="alert-dialog-description"
+      >
+        <DialogTitle id="alert-dialog-title">¿Esta seguro que desea eliminar el usuario?</DialogTitle>
+        <DialogActions>
+          <Button onClick={this.deleteEmployee} color="primary">
+            Si
+          </Button>
+          <Button onClick={e => this.setState({verification: false})} color="primary" autoFocus>
+            No
+          </Button>
+        </DialogActions>
+      </Dialog>
         </form>
       </div>
     )

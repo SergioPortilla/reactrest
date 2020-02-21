@@ -37,8 +37,8 @@ export class EmployeeList extends React.Component {
           <Table className="efwe" aria-label="simple table">
             <TableHead>
               <TableRow>
-                <TableCell>Nombre empleado</TableCell>
-                <TableCell align="right">N° Identificacion</TableCell>
+                <TableCell><b>NOMBRE EMPLEADO</b></TableCell>
+                <TableCell align="right"><b>N° IDENTIDAD</b></TableCell>
               </TableRow>
             </TableHead>
             <TableBody>
