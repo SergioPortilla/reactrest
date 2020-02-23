@@ -4,8 +4,6 @@ import MuiAlert from '@material-ui/lab/Alert';
 import Snackbar from '@material-ui/core/Snackbar';
 import '../styles/components.css';
 
-import { updateCoinsEmployee } from '../actions/actionOfEmployee';
-
 export class MessageInfo extends React.Component {
   constructor(props) {
     super(props);
@@ -16,12 +14,8 @@ export class MessageInfo extends React.Component {
     }
   }
 
-  componentDidMount() {
-    updateCoinsEmployee().then(response => {this.componentWillReceiveProps(response,true,"success")});
-  }
-
-  componentWillReceiveProps(message, show, severity){
-    this.setState({message: message, open:show, severity: severity});
+  componentWillReceiveProps(nextProps){
+    this.setState({message: nextProps.message, open: nextProps.show, severity: nextProps.severity});
   }
 
   handleClose = (event, reason) => {

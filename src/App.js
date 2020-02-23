@@ -5,7 +5,7 @@ import './App.css';
 import { EmployeeInfo } from './components/employeeCard';
 import { EmployeeList } from './components/employeeList';
 import { ActivityList } from './components/activityList';
-import { MessageInfo } from './components/messageInfo';
+
 
 function Element(props) {
   return (
@@ -52,7 +52,6 @@ class App extends React.Component {
             <Element>
               <img src={logoCeiba} className="ceiba-logo" alt="logo" width="200"/>
             </Element>
-           
           </div>
           
         </div>
@@ -60,5 +59,4 @@ class App extends React.Component {
     );
   }
 }
-// <MessageInfo message="holii" open={true} severity="success" />
 export default App;

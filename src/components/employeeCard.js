@@ -20,6 +20,8 @@ import DialogActions from '@material-ui/core/DialogActions';
 import DialogTitle from '@material-ui/core/DialogTitle';
 
 import imgAvatar from '../images/imgAvatar.png';
+import { MessageInfo } from './messageInfo';
+import { updateCoinsEmployee, editEmployee } from '../actions/actionOfEmployee';
 import '../styles/components.css';
 
 export class EmployeeInfo extends React.Component {
@@ -40,7 +42,9 @@ export class EmployeeInfo extends React.Component {
       },
       open: false,
       editable: false,
-      verification: false
+      verification: false,
+      mensaje: '',
+      show: false
     }
   }
   
@@ -56,9 +60,13 @@ export class EmployeeInfo extends React.Component {
         state: true,
       },
       newEmployee: true,
-      editable: false
+      editable: false,
     })
   };
+
+  componentDidMount() {
+    updateCoinsEmployee().then(response => {alert(response);this.setState({mensaje: response,show: true})});
+  }
 
   componentWillReceiveProps(nextProps){
     fetch('http://localhost:8081/ceibacoins/'+nextProps.nuip)
@@ -67,7 +75,7 @@ export class EmployeeInfo extends React.Component {
         newEmployee: false,
         editable: true
       })
-    );
+    ).catch(error => {this.setState({mensaje: 'No se puede consultar empleados los fines de semana', show: true})});
   }
 
   validateChange(value, field){
@@ -91,24 +99,18 @@ export class EmployeeInfo extends React.Component {
   }
 
   deleteEmployee = e => {
-    e.preventDefault();
-    this.validateChange(false,"state");
-    this.validateChange(0,"ceibaCoins");
-    let update = this.state.employeeData;
-    console.log(update);
-    fetch('http://localhost:8081/ceibacoins', {
-      method: 'PUT',
-      body: JSON.stringify(update),
-      headers:{ 'Content-Type': 'application/json' }
-    }).then(res => console.log(res)
-    ).catch(err => console.log("dsfds"+err));
-    this.setState({verification: false}) 
+    editEmployee(this.state.employeeData, true).then(res => alert("usuario eliminado exitosamente"));
+    this.setState({verification: false});
+  }
+
+  editEmployee = e => {
+    editEmployee(this.state.employeeData, false).then(res => alert(res));
   }
 
   render() {
     return (
       <div>
-        <form onSubmit={this.createEmployee}>
+        <form onSubmit={this.createEmployee} >
           <Avatar alt="Remy Sharp" src={imgAvatar} style={{ margin: 'auto', width: '20vh', height: '20vh' }} />
           <div id="employee-data">
             <div className="algo" >
@@ -159,7 +161,7 @@ export class EmployeeInfo extends React.Component {
                 <IconButton aria-label="delete" onClick={e => this.setState({verification: true})}>
                   <DeleteIcon style={{ color: red[500] }}/>
                 </IconButton>
-                <IconButton aria-label="PersonAddRoundedIcon" color="primary"  onClick={this.addNewEmployee}>
+                <IconButton aria-label="PersonAddRoundedIcon" color="primary" onClick={this.addNewEmployee}>
                   <PersonAddRoundedIcon />
                 </IconButton>
                 {this.state.editable ? 
@@ -167,7 +169,7 @@ export class EmployeeInfo extends React.Component {
                     <EditRoundedIcon style={{ color: yellow[500] }}/>
                   </IconButton>
                 : 
-                  <IconButton aria-label="EditRoundedIcon" onClick={this.deleteEmployee}>
+                  <IconButton aria-label="EditRoundedIcon" onClick={this.editEmployee}>
                     <DoneIcon style={{ color: green[500] }}/>
                   </IconButton>
                 }
@@ -186,15 +188,16 @@ export class EmployeeInfo extends React.Component {
       >
         <DialogTitle id="alert-dialog-title">¿Esta seguro que desea eliminar el usuario?</DialogTitle>
         <DialogActions>
-          <Button onClick={this.deleteEmployee} color="primary">
+          <Button onClick={this.deleteEmployee} color="primary" autoFocus>
             Si
           </Button>
-          <Button onClick={e => this.setState({verification: false})} color="primary" autoFocus>
+          <Button onClick={e => this.setState({verification: false})} color="primary">
             No
           </Button>
         </DialogActions>
       </Dialog>
         </form>
+        <MessageInfo open={this.state.show} message={this.state.mensaje} severity="warning" />
       </div>
     )
   }
