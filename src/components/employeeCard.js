@@ -21,7 +21,7 @@ import DialogTitle from '@material-ui/core/DialogTitle';
 
 import imgAvatar from '../images/imgAvatar.png';
 import { MessageInfo } from './messageInfo';
-import { updateCoinsEmployee, editEmployee } from '../actions/actionOfEmployee';
+import { updateCoinsEmployee, editEmployee , createEmployee, findEmployee} from '../actions/actionOfEmployee';
 import '../styles/components.css';
 
 export class EmployeeInfo extends React.Component {
@@ -65,17 +65,16 @@ export class EmployeeInfo extends React.Component {
   };
 
   componentDidMount() {
-    updateCoinsEmployee().then(response => {alert(response);this.setState({mensaje: response,show: true})});
+    setTimeout(() => {
+      updateCoinsEmployee().then(response => {alert(response);this.setState({mensaje: response,show: true})});
+    }, 1000000)
   }
 
   componentWillReceiveProps(nextProps){
-    fetch('http://localhost:8081/ceibacoins/'+nextProps.nuip)
-      .then(response => response.json())
-      .then(employeeData => this.setState({ employeeData,
-        newEmployee: false,
-        editable: true
-      })
-    ).catch(error => {this.setState({mensaje: 'No se puede consultar empleados los fines de semana', show: true})});
+    findEmployee(nextProps.nuip).then(employeeData => this.setState({ employeeData,
+      newEmployee: false,
+      editable: true
+    })).catch(error => {this.setState({mensaje: 'No se puede consultar empleados los fines de semana', show: true})});
   }
 
   validateChange(value, field){
@@ -88,13 +87,7 @@ export class EmployeeInfo extends React.Component {
 
   createEmployee = e => {
     e.preventDefault();
-    fetch('http://localhost:8081/ceibacoins', {
-      method: 'POST',
-      body: JSON.stringify(this.state.employeeData),
-      headers:{ 'Content-Type': 'application/json' }
-    }).then(res => {
-        return console.log(res);
-    }).catch(err => console.log("dsfds"+err));
+    createEmployee(this.state.employeeData).then(res => { alert(res); });
     
   }
 
@@ -103,7 +96,7 @@ export class EmployeeInfo extends React.Component {
     this.setState({verification: false});
   }
 
-  editEmployee = e => {
+  editDataEmployee = e => {
     editEmployee(this.state.employeeData, false).then(res => alert(res));
   }
 
@@ -113,49 +106,47 @@ export class EmployeeInfo extends React.Component {
         <form onSubmit={this.createEmployee} >
           <Avatar alt="Remy Sharp" src={imgAvatar} style={{ margin: 'auto', width: '20vh', height: '20vh' }} />
           <div id="employee-data">
-            <div className="algo" >
-              <TextField required disabled={!this.state.newEmployee} fullWidth
+            <div className="space-column" >
+              <TextField required disabled={!this.state.newEmployee} fullWidth id="nuip"
                 label="Numero de identificación" value={this.state.employeeData.nuip}
                 onInput={(e) => { this.validateChange(e.target.value.replace(/\D/g, ''), 'nuip') }}
               />
             </div>
-            <div className="algo">
-              <TextField required disabled={this.state.editable} fullWidth
+            <div className="space-column">
+              <TextField required disabled={this.state.editable} fullWidth id="name"
                 label="Nombres" value={this.state.employeeData.employeeName} 
                 onInput={(e) => { this.validateChange(e.target.value.toUpperCase(), 'employeeName') }}
               />
             </div>
-            <div className="algo">
-              <TextField required disabled={this.state.editable} fullWidth
+            <div className="space-column">
+              <TextField required disabled={this.state.editable} fullWidth id="lastName"
                 label="Apellidos" value={this.state.employeeData.employeeLastName}
                 onInput={(e) => { this.validateChange(e.target.value.toUpperCase(), 'employeeLastName') }}
               />
               
             </div>
-            {!this.state.newEmployee && (<div className="algo">
-                <Input
-                  id="standard-adornment-amount"
-                  value={this.state.employeeData.ceibaCoins} fullWidth disabled
-                  startAdornment={<InputAdornment position="start">Ceibacoins $</InputAdornment>}
+            {!this.state.newEmployee && (<div className="space-column">
+                <Input value={this.state.employeeData.ceibaCoins} fullWidth disabled id="ceibaCoins"
+                       startAdornment={<InputAdornment position="start">Ceibacoins $</InputAdornment>}
                 />
             </div>)}
             <MuiPickersUtilsProvider utils={DateFnsUtils}>
-            <div className="algo">
-              <KeyboardDatePicker disableToolbar variant="inline" format="dd/MM/yyyy"
+            <div className="space-column">
+              <KeyboardDatePicker disableToolbar variant="inline" format="dd/MM/yyyy" id="bornDate"
                 label="Fecha de nacimiento" fullWidth disabled={this.state.editable}
                 value={this.state.employeeData.birthday} onChange={(e) => { this.validateChange(e, 'birthday') }}
                 KeyboardButtonProps={{ 'aria-label': 'change date', }}
               />
             </div>
-            <div className="algo">
-              <KeyboardDatePicker disableToolbar variant="inline" format="dd/MM/yyyy"
+            <div className="space-column">
+              <KeyboardDatePicker disableToolbar variant="inline" format="dd/MM/yyyy" id="entryDate"
                 label="Fecha de ingreso a la compañia" fullWidth disabled={this.state.editable}
                 value={this.state.employeeData.entry} onChange={(e) => { this.validateChange(e, 'entry') }}
                 KeyboardButtonProps={{ 'aria-label': 'change date', }}
               />
             </div>
             </MuiPickersUtilsProvider>
-            <div className="algo">
+            <div className="space-column">
             {!this.state.newEmployee ? (
               <div style={{float: 'right'}} >
                 <IconButton aria-label="delete" onClick={e => this.setState({verification: true})}>
@@ -169,13 +160,13 @@ export class EmployeeInfo extends React.Component {
                     <EditRoundedIcon style={{ color: yellow[500] }}/>
                   </IconButton>
                 : 
-                  <IconButton aria-label="EditRoundedIcon" onClick={this.editEmployee}>
+                  <IconButton aria-label="EditRoundedIcon" onClick={this.editDataEmployee}>
                     <DoneIcon style={{ color: green[500] }}/>
                   </IconButton>
                 }
               </div>
             ) : (
-              <Button type="submit" variant="outlined" size="medium" color="primary" > Crear Empleado </Button>
+              <Button type="submit" variant="outlined" size="medium" color="primary" id="createEmploye"> Crear Empleado </Button>
             )}
           </div>
         </div>

@@ -9,6 +9,7 @@ import TableRow from '@material-ui/core/TableRow';
 import Paper from '@material-ui/core/Paper';
 
 import { LoadingInfo } from './loadingInfo';
+import { findAllEmployees } from '../actions/actionOfEmployee';
 import '../styles/components.css';
 
 export class EmployeeList extends React.Component {
@@ -20,10 +21,9 @@ export class EmployeeList extends React.Component {
       componentfetch: true,
     }
   }
+  
   componentDidMount() {
-    fetch('http://localhost:8081/ceibacoins')
-      .then(response => response.json())
-      .then(jsonData => this.setState({ employees: jsonData, componentfetch: false }))
+    findAllEmployees().then(jsonData => this.setState({ employees: jsonData, componentfetch: false }));
   }
   
   render() {
@@ -34,7 +34,7 @@ export class EmployeeList extends React.Component {
     return (
       <div>
         <TableContainer component={Paper}>
-          <Table className="efwe" aria-label="simple table">
+          <Table aria-label="simple table">
             <TableHead>
               <TableRow>
                 <TableCell><b>NOMBRE EMPLEADO</b></TableCell>
@@ -43,7 +43,9 @@ export class EmployeeList extends React.Component {
             </TableHead>
             <TableBody>
               {this.state.employees.map(employee => (
-                <TableRow hover role="checkbox" key={employee.nuip} tabIndex={-1} onClick={(e) => this.props.obtenerNuip(employee.nuip)} >
+                <TableRow hover role="checkbox" key={employee.nuip} tabIndex={-1} 
+                          id={"employee"+this.state.employees.findIndex(e => e.nuip === employee.nuip)}
+                          onClick={(e) => this.props.obtenerNuip(employee.nuip)} >
                   <TableCell component="th" scope="row">
                     {employee.employeeName} {employee.employeeLastName}
                   </TableCell>

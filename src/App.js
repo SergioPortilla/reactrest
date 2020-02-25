@@ -10,7 +10,7 @@ import { ActivityList } from './components/activityList';
 function Element(props) {
   return (
     <div className="element">
-      <div>{props.name}</div>
+      <div className={props.name !== undefined && "title-element"}>{props.name}</div>
       {props.children}
     </div>
   )
